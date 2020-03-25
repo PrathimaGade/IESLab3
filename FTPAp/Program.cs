@@ -21,6 +21,7 @@ namespace FTPAp
 
         static void Main(string[] args)
         {
+
             Student myrecord = new Student { StudentId = "200430242", FirstName = "BalaPrathima", LastName = "Gade" };
             List<Student> students = new List<Student>();
             List<string> directories = FTP.GetDirectory(Constants.FTP.BaseUrl);
@@ -35,7 +36,7 @@ namespace FTPAp
                 Console.WriteLine(student);
                 string infoFilePath = student.FullPathUrl + "/" + Constants.Locations.InfoFile;
                 string imageFilePath = student.FullPathUrl + "/" + Constants.Locations.ImageFile;
-                
+
 
                 bool fileExists = FTP.FileExists(infoFilePath);
                 if (FTP.FileExists(student.InfoCSVPath))
@@ -61,8 +62,13 @@ namespace FTPAp
                 {
                     string csvPath = $@"/Users/shine/Desktop/Student/{directory}.csv";
 
+
                     //FTP.DownloadFile(infoFilePath, csvPath);
                     Console.WriteLine("Found info file:");
+                }
+                if (student.StudentId == "200430242")
+                {
+                    student.MyRecord = true;
                 }
                 else
                 {
@@ -71,7 +77,7 @@ namespace FTPAp
 
                 Console.WriteLine("\t" + infoFilePath);
 
-            
+
 
                 bool imageFileExists = FTP.FileExists(imageFilePath);
 
@@ -92,44 +98,34 @@ namespace FTPAp
 
             //Save to CSV
             string studentsCSVPath = $"{Constants.Locations.DataFolder}//students.csv";
-            string input = "20043";
-            //Establish a FileStream to collect data from response
-            using (StreamWriter fs = new StreamWriter(studentsCSVPath))
-            {
-                foreach (var student in students)
-                {
-                    fs.WriteLine(student.ToCSV());
-                    fs.WriteLine(student.ToString());
-                    Console.WriteLine(input.StartsWith(student.ToString()).ToString());
-                    
-                }
-            }
-           int count = students.Count();
-            Console.WriteLine("Number of students:"+count);
+
+
+
+            int count = students.Count();
+            Console.WriteLine("Number of students:" + count);
 
             string inputStartsWith = "P";
             string inputContains = "ra";
             int countStartsWith = 0;
             int countContains = 0;
-            foreach (var list in students)
+            foreach (var student in students)
             {
-                string s = list.LastName;
-                if (s.StartsWith(inputStartsWith))
+                string name = student.FirstName;
+                if (name.StartsWith(inputStartsWith))
                 {
-                    Console.WriteLine("Last starts with " + inputStartsWith + " " + list);
+                    Console.WriteLine("Last starts with " + inputStartsWith + " " + student);
                     countStartsWith++;
                 }
-            }
+            
             Console.WriteLine("Number of people having LastName that starts with 'P':" + countStartsWith);
-            foreach (var list1 in students)
+
+            
+            if (name.Contains(inputContains))
             {
-                string s = list1.LastName;
-                if (s.Contains(inputContains))
-                {
-                    Console.WriteLine("Last starts with " + inputContains + " " + list1);
-                    countContains++;
-                }
+                Console.WriteLine("Last starts with " + inputContains + " " + student);
+                countContains++;
             }
+           }
             Console.WriteLine("Number of people having LastName that contains 'ra':" + countContains);
 
             Student me = students.SingleOrDefault(x => x.StudentId == myrecord.StudentId);
@@ -155,6 +151,19 @@ namespace FTPAp
                 }
             }
 
+            string studentsxmlPath = $"{Constants.Locations.DataFolder}//students.xml";
+            //Establish a file stream to collect data from the response
+            using (StreamWriter fs = new StreamWriter(studentsxmlPath))
+            {
+                XmlSerializer x = new XmlSerializer(students.GetType());
+                x.Serialize(fs, students);
+                Console.WriteLine();
+            }
+            string localUploadFilePath = @"{Constants.Locations.DataFolder}//students.json";
+ 
+
+            FTP.UploadFile(localUploadFilePath, Constants.FTP.BaseUrl + "/200430242 BalaPrathima Gade/students.json");
+
 
             //XmlSerializer serialiser = new XmlSerializer(typeof(List<Student>));
 
@@ -165,9 +174,9 @@ namespace FTPAp
             //Filestream.Close();
 
 
-            //return;
+            return;
 
-   
+
 
         }
     }

@@ -34,11 +34,11 @@ namespace FTPAp.Models
             public const int OperationPauseTime = 10000;
         }
 
-        //public class Student
-        //{
-        //    public const string InfoCSVFileName = "info.csv";
-        //    public const string MyImageFileName = "myimage.jpg";
-        //}
+        public class Student
+        {
+            public const string InfoCSVFileName = "info.csv";
+            public const string MyImageFileName = "myimage.jpg";
+        }
     }
     
 }
