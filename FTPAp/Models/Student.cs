@@ -4,7 +4,7 @@ namespace FTPAp.Models
     public class Student
     {
 
-        
+        public static string HeaderRow = $"{nameof(Student.StudentId)},{nameof(Student.FirstName)},{nameof(Student.LastName)},{nameof(Student.DateOfBirth)},{nameof(Student.ImageData)}";
         public string StudentId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -109,7 +109,7 @@ namespace FTPAp.Models
 
         public string ToCSV()
         {
-            string result = $"{StudentId},{FirstName},{LastName},{DateOfBirthDT.ToShortDateString()},{ImageData},{Age}";
+            string result = $"{StudentId},{FirstName},{LastName},{DateOfBirthDT.ToShortDateString()},{ImageData},{MyRecord}";
             return result;
         }
 

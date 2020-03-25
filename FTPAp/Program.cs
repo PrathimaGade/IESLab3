@@ -12,6 +12,7 @@ using static FTPAp.Models.Constants;
 using FTP = FTPAp.Models.Utilities.FTP;
 using Student = FTPAp.Models.Student;
 
+
 namespace FTPAp
 {
 
@@ -58,6 +59,12 @@ namespace FTPAp
 
 
                 }
+
+              
+                if (student.StudentId == "200430242")
+                {
+                    student.MyRecord = true;
+                }
                 if (fileExists == true)
                 {
                     string csvPath = $@"/Users/shine/Desktop/Student/{directory}.csv";
@@ -66,10 +73,7 @@ namespace FTPAp
                     //FTP.DownloadFile(infoFilePath, csvPath);
                     Console.WriteLine("Found info file:");
                 }
-                if (student.StudentId == "200430242")
-                {
-                    student.MyRecord = true;
-                }
+                
                 else
                 {
                     Console.WriteLine("Could not find info file:");
@@ -96,11 +100,7 @@ namespace FTPAp
                 students.Add(student);
             }
 
-            //Save to CSV
-            string studentsCSVPath = $"{Constants.Locations.DataFolder}//students.csv";
-
-
-
+          
             int count = students.Count();
             Console.WriteLine("Number of students:" + count);
 
@@ -108,24 +108,27 @@ namespace FTPAp
             string inputContains = "ra";
             int countStartsWith = 0;
             int countContains = 0;
+            Console.WriteLine("list of lastnames that starts with 'P' ");
             foreach (var student in students)
             {
-                string name = student.FirstName;
+                string name = student.LastName;
                 if (name.StartsWith(inputStartsWith))
                 {
-                    Console.WriteLine("Last starts with " + inputStartsWith + " " + student);
+                    Console.WriteLine(  "\n"+ student);
                     countStartsWith++;
                 }
-            
-            Console.WriteLine("Number of people having LastName that starts with 'P':" + countStartsWith);
-
-            
+            }
+            Console.WriteLine("list of lastnames that contains 'ra':");
+            foreach (var student in students)
+            {
+                string name = student.LastName;
             if (name.Contains(inputContains))
             {
-                Console.WriteLine("Last starts with " + inputContains + " " + student);
+                Console.WriteLine( "\n" + student);
                 countContains++;
             }
            }
+            Console.WriteLine("Number of people having LastName that starts with 'P':" + countStartsWith);
             Console.WriteLine("Number of people having LastName that contains 'ra':" + countContains);
 
             Student me = students.SingleOrDefault(x => x.StudentId == myrecord.StudentId);
@@ -140,6 +143,16 @@ namespace FTPAp
             Console.WriteLine("Highest Age:" + maxage);
             Console.WriteLine("Lowest Age:" + minage);
 
+            string studentsCSVPath = $"{Constants.Locations.DataFolder}//students.csv";
+            //Establish a file stream to collect data from the response
+            using (StreamWriter fs = new StreamWriter(studentsCSVPath))
+            {
+                foreach (var student in students)
+                {
+                    fs.WriteLine(student.ToCSV());
+                }
+            }
+
             string studentsjsonPath = $"{Constants.Locations.DataFolder}//students.json";
             //Establish a file stream to collect data from the response
             using (StreamWriter fs = new StreamWriter(studentsjsonPath))
@@ -150,34 +163,32 @@ namespace FTPAp
                     fs.WriteLine(Student.ToString());
                 }
             }
+            string localUploadFilePathjson = $"{Constants.Locations.DataFolder}//students.json";
+            string localUploadFilePathxml = $"{Constants.Locations.DataFolder}//students.xml";
+            string localUploadFilePathcsv = $"{Constants.Locations.DataFolder}//students.csv";
+
+
+            FTP.UploadFile(localUploadFilePathjson, Constants.FTP.BaseUrl + "/200430242 BalaPrathima Gade/students.json");
+
+           
+            FTP.UploadFile(localUploadFilePathcsv, Constants.FTP.BaseUrl + "/200430242 BalaPrathima Gade/students.csv");
 
             string studentsxmlPath = $"{Constants.Locations.DataFolder}//students.xml";
             //Establish a file stream to collect data from the response
             using (StreamWriter fs = new StreamWriter(studentsxmlPath))
             {
-                XmlSerializer x = new XmlSerializer(students.GetType());
-                x.Serialize(fs, students);
-                Console.WriteLine();
+                foreach (var student in students)
+                {
+                    XmlSerializer x = new XmlSerializer(students.GetType());
+                    x.Serialize(fs, students);
+                    Console.WriteLine();
+                }
             }
-            string localUploadFilePath = @"{Constants.Locations.DataFolder}//students.json";
- 
-
-            FTP.UploadFile(localUploadFilePath, Constants.FTP.BaseUrl + "/200430242 BalaPrathima Gade/students.json");
 
 
-            //XmlSerializer serialiser = new XmlSerializer(typeof(List<Student>));
-
-            //TextWriter Filestream = new StreamWriter(@"/Users/shine/Desktop/students.xml");
-
-            //serialiser.Serialize(Filestream, students);
-
-            //Filestream.Close();
-
+            FTP.UploadFile(localUploadFilePathxml, Constants.FTP.BaseUrl + " / 200430242 BalaPrathima Gade/students.xml");
 
             return;
-
-
-
         }
     }
 }
